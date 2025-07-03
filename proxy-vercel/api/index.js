@@ -7,6 +7,16 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  // 🚨 Agregar cabeceras CORS
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Puedes cambiar '*' por 'https://vitaleval.web.app' si deseas más seguridad
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // 💡 Responder preflight (verificación previa)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method === 'POST') {
     const urlDestino = 'https://script.google.com/macros/s/AKfycbz8SJUNOUZQDDEl595LspcMTWyhR7FYjqUy2f_ZENYutUhXqz3ho8Rzts9redJU6KUf/exec';
 
