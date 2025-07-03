@@ -7,6 +7,17 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://vitaleval.web.app');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Responder rápido a preflight (OPTIONS)
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === 'POST') {
     const urlDestino = 'https://script.google.com/macros/s/AKfycbz8SJUNOUZQDDEl595LspcMTWyhR7FYjqUy2f_ZENYutUhXqz3ho8Rzts9redJU6KUf/exec';
 
@@ -20,14 +31,14 @@ export default async function handler(req, res) {
 
       const datos = await respuesta.json();
 
-      // 2. Enviar mensaje de WhatsApp por Gupshup
+      // 2. Enviar mensaje por WhatsApp si es válido
       const telefono = req.body.whatsapp?.toString();
       const nombre = req.body.nombre;
 
       if (telefono && nombre) {
         const mensajeGupshup = new URLSearchParams({
           channel: 'whatsapp',
-          source: '584142605919',  // Número de tu bot
+          source: '584142605919',
           destination: telefono,
           message: JSON.stringify({
             type: 'template',
@@ -38,14 +49,12 @@ export default async function handler(req, res) {
               components: [
                 {
                   type: 'body',
-                  parameters: [
-                    { type: 'text', text: nombre }
-                  ]
+                  parameters: [{ type: 'text', text: nombre }]
                 }
               ]
             }
           }),
-          src.name: 'EvalBienestarBot'
+          'src.name': 'EvalBienestarBot'
         });
 
         await fetch('https://api.gupshup.io/wa/api/v1/template/msg', {
